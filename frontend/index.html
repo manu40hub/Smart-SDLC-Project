@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartSDLC - AI-Powered Development Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .scenarios-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .scenario-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .scenario-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 48px rgba(0,0,0,0.15);
+        }
+
+        .scenario-card h3 {
+            color: #4a5568;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .result-area {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            display: none;
+        }
+
+        .result-area.show {
+            display: block;
+        }
+
+        .result-area h4 {
+            color: #4a5568;
+            margin-bottom: 10px;
+        }
+
+        .code-block {
+             background-color: #0d0d0d;
+    color: #33ff99;
+    padding: 1rem;
+    border-radius: 10px;
+    white-space: pre-wrap;
+    font-family: monospace;
+        }
+
+        .phase-group {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f0f4f8;
+            border-radius: 8px;
+        }
+
+        .phase-group h5 {
+            color: #2d3748;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .requirement-item {
+            background: white;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            border-left: 3px solid #667eea;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            background: #fed7d7;
+            color: #c53030;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .success-message {
+            background: #c6f6d5;
+            color: #2f855a;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        /* Chatbot Styles */
+        .chatbot-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 300px;
+            height: 400px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            display: none;
+            flex-direction: column;
+            z-index: 1000;
+        }
+
+        .chatbot-container.show {
+            display: flex;
+        }
+
+        .chatbot-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 15px 15px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chatbot-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            background: #f8f9fa;
+        }
+
+        .chatbot-input {
+            padding: 15px;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            gap: 10px;
+        }
+
+        .chatbot-input input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 5px;
+        }
+
+        .chatbot-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .chatbot-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        .message {
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            max-width: 80%;
+        }
+
+        .message.user {
+            background: #667eea;
+            color: white;
+            margin-left: auto;
+        }
+
+        .message.bot {
+            background: #e2e8f0;
+            color: #2d3748;
+        }
+
+        .file-upload-area {
+            border: 2px dashed #cbd5e0;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload-area:hover {
+            border-color: #667eea;
+            background: #f7fafc;
+        }
+
+        .file-upload-area.dragover {
+            border-color: #667eea;
+            background: #ebf8ff;
+        }
+       
+         #manoharSignature {
+        position: fixed;
+        bottom: 10px;
+        left: 20px;
+        background: rgba(30, 30, 30, 0.85);
+        color: #00ffaa;
+        font-family: 'Courier New', monospace;
+        font-size: 13px;
+        padding: 6px 14px;
+        border: 1px solid #00ffaa;
+        border-radius: 10px;
+        z-index: 9999;
+        animation: glow-pulse 2s ease-in-out infinite;
+        box-shadow: 0 0 10px #00ffaa55;
+        user-select: none;
+    }
+     @keyframes glow-pulse {
+        0% { box-shadow: 0 0 5px #00ffaa33; }
+        50% { box-shadow: 0 0 12px #00ffaaaa; }
+        100% { box-shadow: 0 0 5px #00ffaa33; }
+    }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>SmartSDLC</h1>
+            <p>AI-Powered Software Development Lifecycle Platform</p>
+        </div>
+
+        <div class="scenarios-grid">
+            <!-- Scenario 1: Requirement Upload and Classification -->
+            <div class="scenario-card">
+                <h3>📋 Requirement Upload & Classification</h3>
+                <form id="requirementForm">
+                    <div class="form-group">
+                        <label for="pdfFile">Upload PDF Document:</label>
+                        <div class="file-upload-area" id="fileUploadArea">
+                            <input type="file" id="pdfFile" name="pdf" accept=".pdf" style="display: none;">
+                            <p>Click to select PDF or drag & drop</p>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn">Classify Requirements</button>
+                </form>
+                <div class="loading" id="requirementLoading">
+                    <div class="spinner"></div>
+                    <p>Processing requirements...</p>
+                </div>
+                <div class="result-area" id="requirementResult">
+                    <h4>Classified Requirements:</h4>
+                    <div id="requirementOutput"></div>
+                </div>
+                <div class="error-message" id="requirementError"></div>
+            </div>
+
+            <!-- Scenario 2: AI Code Generator -->
+            <div class="scenario-card">
+                <h3>🚀 AI Code Generator</h3>
+                <form id="codeGenForm">
+                    <div class="form-group">
+                        <label for="codePrompt">Describe what you want to build:</label>
+                        <textarea id="codePrompt" placeholder="e.g., Create a Python function to calculate fibonacci numbers"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="codeLanguage">Programming Language:</label>
+                        <select id="codeLanguage">
+                            <option value="python">Python</option>
+                            <option value="javascript">JavaScript</option>
+                            <option value="java">Java</option>
+                            <option value="cpp">C++</option>
+                            <option value="csharp">C#</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn">Generate Code</button>
+                </form>
+                <div class="loading" id="codeGenLoading">
+                    <div class="spinner"></div>
+                    <p>Generating code...</p>
+                </div>
+                <div class="result-area" id="codeGenResult">
+                    <h4>Generated Code:</h4>
+                    <div class="code-block" id="generatedCode"></div>
+                </div>
+                <div class="error-message" id="codeGenError"></div>
+            </div>
+
+            <!-- Scenario 3: Bug Fixer -->
+            <div class="scenario-card">
+                <h3>🔧 Bug Fixer</h3>
+                <form id="bugFixForm">
+                    <div class="form-group">
+                        <label for="buggyCode">Paste your buggy code:</label>
+                        <textarea id="buggyCode" placeholder="Paste your code here..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="bugLanguage">Language:</label>
+                        <select id="bugLanguage">
+                            <option value="python">Python</option>
+                            <option value="javascript">JavaScript</option>
+                            <option value="java">Java</option>
+                            <option value="cpp">C++</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn">Fix Bugs</button>
+                </form>
+                <div class="loading" id="bugFixLoading">
+                    <div class="spinner"></div>
+                    <p>Analyzing and fixing bugs...</p>
+                </div>
+                <div class="result-area" id="bugFixResult">
+                    <h4>Fixed Code & Analysis:</h4>
+                    <div id="bugFixOutput"></div>
+                </div>
+                <div class="error-message" id="bugFixError"></div>
+            </div>
+
+            <!-- Scenario 4: Test Case Generator -->
+            <div class="scenario-card">
+                <h3>🧪 Test Case Generator</h3>
+                <form id="testGenForm">
+                    <div class="form-group">
+                        <label for="testCode">Code to test:</label>
+                        <textarea id="testCode" placeholder="Paste your code here..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="testRequirement">Or describe requirement:</label>
+                        <textarea id="testRequirement" placeholder="Describe the functionality to test..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="testFramework">Testing Framework:</label>
+                        <select id="testFramework">
+                            <option value="unittest">unittest (Python)</option>
+                            <option value="pytest">pytest (Python)</option>
+                            <option value="jest">Jest (JavaScript)</option>
+                            <option value="junit">JUnit (Java)</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn">Generate Tests</button>
+                </form>
+                <div class="loading" id="testGenLoading">
+                    <div class="spinner"></div>
+                    <p>Generating test cases...</p>
+                </div>
+                <div class="result-area" id="testGenResult">
+                    <h4>Generated Test Cases:</h4>
+                    <div class="code-block" id="generatedTests"></div>
+                </div>
+                <div class="error-message" id="testGenError"></div>
+            </div>
+
+            <!-- Scenario 5: Code Summarizer -->
+            <div class="scenario-card">
+                <h3>📝 Code Summarizer</h3>
+                <form id="summarizeForm">
+                    <div class="form-group">
+                        <label for="codeToSummarize">Code to summarize:</label>
+                        <textarea id="codeToSummarize" placeholder="Paste your code here for analysis..."></textarea>
+                    </div>
+                    <button type="submit" class="btn">Summarize Code</button>
+                </form>
+                <div class="loading" id="summarizeLoading">
+                    <div class="spinner"></div>
+                    <p>Analyzing code...</p>
+                </div>
+                <div class="result-area" id="summarizeResult">
+                    <h4>Code Summary:</h4>
+                    <div id="codeSummary"></div>
+                </div>
+                <div class="error-message" id="summarizeError"></div>
+            </div>
+
+            <!-- Scenario 6: Project Status Dashboard -->
+            <div class="scenario-card">
+                <h3>📊 Project Dashboard</h3>
+                <div class="form-group">
+                    <button class="btn" onclick="refreshDashboard()">Refresh Dashboard</button>
+                </div>
+                <div class="result-area show" id="dashboardResult">
+                    <h4>Platform Status:</h4>
+                    <div id="dashboardContent">
+                        <p>Click refresh to check system status...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Chatbot -->
+    <button class="chatbot-toggle" id="chatbotToggle">💬</button>
+    
+    <div class="chatbot-container" id="chatbotContainer">
+        <div class="chatbot-header">
+            <h4>SDLC Assistant</h4>
+            <button onclick="toggleChatbot()" style="background: none; border: none; color: white; font-size: 18px; cursor: pointer;">×</button>
+        </div>
+        <div class="chatbot-messages" id="chatMessages">
+            <div class="message bot">
+                <p>Hello! I'm your SDLC assistant. Ask me anything about software development lifecycle, testing, requirements, or coding practices!</p>
+            </div>
+        </div>
+        <div class="chatbot-input">
+            <input type="text" id="chatInput" placeholder="Ask me about SDLC..." />
+            <button onclick="sendMessage()" class="btn" style="width: auto; padding: 8px 16px;">Send</button>
+        </div>
+    </div>
+   
+    <div id="manoharSignature">
+    <span>⌁ Signed by <strong>G.Manohar Kumar</strong> ⌁</span>
+</div>
+
+    <script>
+        const API_BASE = 'http://127.0.0.1:5000';
+
+        // Utility functions
+        function showLoading(id) {
+            document.getElementById(id).classList.add('show');
+        }
+
+        function hideLoading(id) {
+            document.getElementById(id).classList.remove('show');
+        }
+
+        function showResult(id) {
+            document.getElementById(id).classList.add('show');
+        }
+
+        function hideResult(id) {
+            document.getElementById(id).classList.remove('show');
+        }
+
+        function showError(id, message) {
+            const errorElement = document.getElementById(id);
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+            setTimeout(() => {
+                errorElement.style.display = 'none';
+            }, 5000);
+        }
+
+        function showSuccess(id, message) {
+            const successElement = document.getElementById(id);
+            successElement.textContent = message;
+            successElement.style.display = 'block';
+            setTimeout(() => {
+                successElement.style.display = 'none';
+            }, 3000);
+        }
+
+        // File upload handling
+        const fileUploadArea = document.getElementById('fileUploadArea');
+        const pdfFileInput = document.getElementById('pdfFile');
+
+        fileUploadArea.addEventListener('click', () => pdfFileInput.click());
+        fileUploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            fileUploadArea.classList.add('dragover');
+        });
+        fileUploadArea.addEventListener('dragleave', () => {
+            fileUploadArea.classList.remove('dragover');
+        });
+        fileUploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            fileUploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0 && files[0].type === 'application/pdf') {
+                pdfFileInput.files = files;
+                fileUploadArea.querySelector('p').textContent = files[0].name;
+            }
+        });
+
+        pdfFileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                fileUploadArea.querySelector('p').textContent = e.target.files[0].name;
+            }
+        });
+
+        // Scenario 1: Requirement Upload and Classification
+        document.getElementById('requirementForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const fileInput = document.getElementById('pdfFile');
+            if (!fileInput.files.length) {
+                showError('requirementError', 'Please select a PDF file');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('pdf', fileInput.files[0]);
+
+            showLoading('requirementLoading');
+            hideResult('requirementResult');
+
+            try {
+                const response = await fetch(`${API_BASE}/upload-requirements`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+                hideLoading('requirementLoading');
+
+                if (data.success) {
+                    displayClassifiedRequirements(data.classified_requirements);
+                    showResult('requirementResult');
+                } else {
+                    showError('requirementError', data.error || 'Failed to process requirements');
+                }
+            } catch (error) {
+                hideLoading('requirementLoading');
+                showError('requirementError', 'Network error: ' + error.message);
+            }
+        });
+
+        function displayClassifiedRequirements(requirements) {
+            const output = document.getElementById('requirementOutput');
+            output.innerHTML = '';
+
+            Object.entries(requirements).forEach(([phase, items]) => {
+                if (items.length > 0) {
+                    const phaseDiv = document.createElement('div');
+                    phaseDiv.className = 'phase-group';
+                    phaseDiv.innerHTML = `
+                        <h5>${phase} (${items.length} items)</h5>
+                        ${items.map(item => `
+                            <div class="requirement-item">
+                                <p>${item.text || 'No text available'}</p>
+                        <small>Confidence: ${item.confidence ? item.confidence.toFixed(1) : 'N/A'}%</small>
+                            </div>
+                        `).join('')}
+                    `;
+                    output.appendChild(phaseDiv);
+                }
+            });
+        }
+
+        // Scenario 2: AI Code Generator
+        document.getElementById('codeGenForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const promptInput = document.getElementById('codePrompt').value.trim();
+            const language = document.getElementById('codeLanguage').value;
+
+            if (!prompt) {
+                showError('codeGenError', 'Please enter a code description');
+                return;
+            }
+            const fullPrompt = `Write the following code in ${language}:\n\n${promptInput}`;
+            showLoading('codeGenLoading');
+            hideResult('codeGenResult');
+
+            try {
+                const response = await fetch(`${API_BASE}/generate-code`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ prompt : fullPrompt})
+                });
+
+                const data = await response.json();
+                hideLoading('codeGenLoading');
+
+                if (data.code) {
+                    document.getElementById('generatedCode').textContent = data.code;
+                    showResult('codeGenResult');
+                } else {
+                    showError('codeGenError', data.error || 'Failed to generate code');
+                }
+            } catch (error) {
+                hideLoading('codeGenLoading');
+                showError('codeGenError', 'Network error: ' + error.message);
+            }
+        });
+
+        // Scenario 3: Bug Fixer
+        document.getElementById('bugFixForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const code = document.getElementById('buggyCode').value.trim();
+            const language = document.getElementById('bugLanguage').value;
+
+            if (!code) {
+                showError('bugFixError', 'Please enter code to fix');
+                return;
+            }
+
+            showLoading('bugFixLoading');
+            hideResult('bugFixResult');
+
+            try {
+                const response = await fetch(`${API_BASE}/fix-bug`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ code, language })
+                });
+
+                const data = await response.json();
+                hideLoading('bugFixLoading');
+
+                if (data.success) {
+                    document.getElementById('bugFixOutput').innerHTML = `
+                        <div class="code-block">${data.fixed_code_response}</div>
+                    `;
+                    showResult('bugFixResult');
+                } else {
+                    showError('bugFixError', data.error || 'Failed to fix bugs');
+                }
+            } catch (error) {
+                hideLoading('bugFixLoading');
+                showError('bugFixError', 'Network error: ' + error.message);
+            }
+        });
+
+        // Scenario 4: Test Case Generator
+        document.getElementById('testGenForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const code = document.getElementById('testCode').value.trim();
+            const requirement = document.getElementById('testRequirement').value.trim();
+            const framework = document.getElementById('testFramework').value;
+
+            if (!code && !requirement) {
+                showError('testGenError', 'Please provide either code or requirement');
+                return;
+            }
+
+            showLoading('testGenLoading');
+            hideResult('testGenResult');
+
+            try {
+                const response = await fetch(`${API_BASE}/generate-tests`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ code, requirement, framework })
+                });
+
+                const data = await response.json();
+                hideLoading('testGenLoading');
+
+                if (data.success) {
+                    document.getElementById('generatedTests').textContent = data.generated_tests;
+                    showResult('testGenResult');
+                } else {
+                    showError('testGenError', data.error || 'Failed to generate tests');
+                }
+            } catch (error) {
+                hideLoading('testGenLoading');
+                showError('testGenError', 'Network error: ' + error.message);
+            }
+        });
+
+        // Scenario 5: Code Summarizer
+        document.getElementById('summarizeForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const code = document.getElementById('codeToSummarize').value.trim();
+
+            if (!code) {
+                showError('summarizeError', 'Please enter code to summarize');
+                return;
+            }
+
+            showLoading('summarizeLoading');
+            hideResult('summarizeResult');
+
+            try {
+                const response = await fetch(`${API_BASE}/summarize-code`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ code })
+                });
+
+                const data = await response.json();
+                hideLoading('summarizeLoading');
+
+                if (data.success) {
+                    document.getElementById('codeSummary').innerHTML = `
+                        <div style="white-space: pre-wrap; line-height: 1.6;">${data.code_summary}</div>
+                    `;
+                    showResult('summarizeResult');
+                } else {
+                    showError('summarizeError', data.error || 'Failed to summarize code');
+                }
+            } catch (error) {
+                hideLoading('summarizeLoading');
+                showError('summarizeError', 'Network error: ' + error.message);
+            }
+        });
+
+        // Dashboard refresh
+        async function refreshDashboard() {
+            try {
+                const response = await fetch(`${API_BASE}/health`);
+                const data = await response.json();
+                
+                const dashboardContent = document.getElementById('dashboardContent');
+                dashboardContent.innerHTML = `
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                        <div style="background: white; padding: 15px; border-radius: 8px; text-align: center;">
+                            <h6>System Status</h6>
+                            <p style="color: ${data.status === 'healthy' ? 'green' : 'red'}; font-weight: bold;">
+                                ${data.status.toUpperCase()}
+                            </p>
+                        </div>
+                        <div style="background: white; padding: 15px; border-radius: 8px; text-align: center;">
+                            <h6>GROQ AI</h6>
+                            <p style="color: ${data.watson_ai_available ? 'green' : 'red'}; font-weight: bold;">
+                                ${data.watson_ai_available ? 'AVAILABLE' : 'UNAVAILABLE'}
+                            </p>
+                        </div>
+                        <div style="background: white; padding: 15px; border-radius: 8px; text-align: center;">
+                            <h6>Last Updated</h6>
+                            <p style="font-size: 0.9em;">
+                                ${new Date(data.timestamp).toLocaleString()}
+                            </p>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                document.getElementById('dashboardContent').innerHTML = `
+                    <p style="color: red;">Error connecting to backend: ${error.message}</p>
+                `;
+            }
+        }
+
+        document.getElementById('manoharSignature').addEventListener('click', () => {
+        alert("SmartSDLC crafted with logic, vision, and coffee ☕ — Manohar Kumar");
+    });
+
+        // Scenario 6: Chatbot functionality
+        function toggleChatbot() {
+            const chatbot = document.getElementById('chatbotContainer');
+            const toggle = document.getElementById('chatbotToggle');
+            
+            if (chatbot.classList.contains('show')) {
+                chatbot.classList.remove('show');
+                toggle.style.display = 'block';
+            } else {
+                chatbot.classList.add('show');
+                toggle.style.display = 'none';
+            }
+        }
+
+        document.getElementById('chatbotToggle').addEventListener('click', toggleChatbot);
+
+        document.getElementById('chatInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+
+            const messagesContainer = document.getElementById('chatMessages');
+            
+            // Add user message
+            const userMessage = document.createElement('div');
+            userMessage.className = 'message user';
+            userMessage.innerHTML = `<p>${message}</p>`;
+            messagesContainer.appendChild(userMessage);
+
+            // Clear input
+            input.value = '';
+
+            // Show typing indicator
+            const typingIndicator = document.createElement('div');
+            typingIndicator.className = 'message bot';
+            typingIndicator.innerHTML = '<p>Thinking...</p>';
+            messagesContainer.appendChild(typingIndicator);
+
+            // Scroll to bottom
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            try {
+                const response = await fetch(`${API_BASE}/chat`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ message })
+                });
+
+                const data = await response.json();
+                
+                // Remove typing indicator
+                messagesContainer.removeChild(typingIndicator);
+
+                // Add bot response
+                const botMessage = document.createElement('div');
+                botMessage.className = 'message bot';
+                botMessage.innerHTML = `<p>${data.success ? data.response : 'Sorry, I encountered an error. Please try again.'}</p>`;
+                messagesContainer.appendChild(botMessage);
+
+            } catch (error) {
+                // Remove typing indicator
+                messagesContainer.removeChild(typingIndicator);
+                
+                // Add error message
+                const errorMessage = document.createElement('div');
+                errorMessage.className = 'message bot';
+                errorMessage.innerHTML = '<p>Sorry, I\'m having trouble connecting. Please try again later.</p>';
+                messagesContainer.appendChild(errorMessage);
+            }
+
+            // Scroll to bottom
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // Initialize dashboard on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            refreshDashboard();
+        });
+    </script>
+</body>
+</html>
